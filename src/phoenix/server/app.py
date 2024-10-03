@@ -31,6 +31,7 @@ from urllib.parse import urlparse
 
 import strawberry
 from fastapi import APIRouter, Depends, FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.utils import is_body_allowed_for_status_code
 from sqlalchemy import select
@@ -60,6 +61,7 @@ from phoenix.config import (
     SERVER_DIR,
     OAuth2ClientConfig,
     get_env_csrf_trusted_origins,
+    get_env_enable_cors,
     get_env_host,
     get_env_port,
     server_instrumentation_is_enabled,
@@ -680,6 +682,7 @@ def create_app(
     email_sender: Optional[EmailSender] = None,
     oauth2_client_configs: Optional[List[OAuth2ClientConfig]] = None,
     bulk_inserter_factory: Optional[Callable[..., BulkInserter]] = None,
+    enable_cors: bool = get_env_enable_cors(),
 ) -> FastAPI:
     if model.embedding_dimensions:
         try:
@@ -859,6 +862,14 @@ def create_app(
         FastAPIInstrumentor().instrument(tracer_provider=tracer_provider)
         FastAPIInstrumentor.instrument_app(app, tracer_provider=tracer_provider)
         shutdown_callbacks_list.append(FastAPIInstrumentor().uninstrument)
+    if enable_cors:
+        app.add_middleware(
+            CORSMiddleware,
+            allow_origins=["*"],
+            allow_credentials=True,
+            allow_methods=["*"],
+            allow_headers=["*"],
+        )
     return app
 
 

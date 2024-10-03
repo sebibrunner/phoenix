@@ -141,6 +141,10 @@ ENV_PHOENIX_SMTP_VALIDATE_CERTS = "PHOENIX_SMTP_VALIDATE_CERTS"
 """
 Whether to validate SMTP server certificates. Defaults to true.
 """
+ENV_PHOENIX_ENABLE_CORS = "PHOENIX_ENABLE_CORS"
+"""
+Whether to enable CORS. Defaults to false.
+"""
 
 
 def server_instrumentation_is_enabled() -> bool:
@@ -699,3 +703,10 @@ def _get_default_idp_display_name(idp_name: str) -> str:
 
 DEFAULT_PROJECT_NAME = "default"
 _KUBERNETES_PHOENIX_PORT_PATTERN = re.compile(r"^tcp://\d{1,3}[.]\d{1,3}[.]\d{1,3}[.]\d{1,3}:\d+$")
+
+
+def get_env_enable_cors() -> bool:
+    """
+    Gets the value of the PHOENIX_ENABLE_CORS environment variable.
+    """
+    return _bool_val(ENV_PHOENIX_ENABLE_CORS, False)
